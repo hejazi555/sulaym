@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملامح من تاريخ قبيلة سليم - الأعلام</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .header {
+            background-color: #fff;
+            border-bottom: 2px solid #ddd;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .stats-section {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stats-section h3 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .stat-card {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            color: #495057;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .alphabet-tabs {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .alphabet-tabs .btn {
+            margin: 5px;
+            min-width: 45px;
+            font-weight: bold;
+        }
+
+        .content-section {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        .letter-section {
+            display: none;
+        }
+
+        .letter-section.active {
+            display: block;
+        }
+
+        .letter-title {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #333;
+        }
+
+        .letter-title .badge {
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+
+        .names-list {
+            column-count: 3;
+            column-gap: 30px;
+        }
+
+        .name-item {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-right: 3px solid #6c757d;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            break-inside: avoid;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #dc3545;
+        }
+
+        @media (max-width: 992px) {
+            .names-list {
+                column-count: 2;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .names-list {
+                column-count: 1;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header text-center">
+            <h1>ملامح من تاريخ قبيلة سليم</h1>
+            <p>الفترة الزمنية: 1190هـ - 1389هـ</p>
+            <p class="fw-bold">إجمالي الأعلام: <span id="totalCount">...</span></p>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <h3>إحصائيات القبائل الرئيسية</h3>
+            <div class="row" id="statsContainer">
+                <div class="loading">جاري تحميل الإحصائيات...</div>
+            </div>
+        </div>
+
+        <!-- Alphabet Tabs -->
+        <div class="alphabet-tabs text-center">
+            <div id="alphabetButtons">
+                <div class="loading">جاري تحميل الحروف...</div>
+            </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="content-section">
+            <div id="content">
+                <div class="loading">جاري تحميل الأسماء...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // قراءة الملف من النظام
+        async function loadData() {
+            try {
+                const fileContent = await window.fs.readFile('tribal_figures_json (1).json', { encoding: 'utf8' });
+                const data = JSON.parse(fileContent);
+                return data;
+            } catch (error) {
+                console.error('خطأ في قراءة الملف:', error);
+                // محاولة قراءة الملف بدون (1)
+                try {
+                    const fileContent = await window.fs.readFile('tribal_figures_json.json', { encoding: 'utf8' });
+                    const data = JSON.parse(fileContent);
+                    return data;
+                } catch (error2) {
+                    console.error('خطأ في قراءة الملف الثاني:', error2);
+                    return null;
+                }
+            }
+        }
+
+        // استخراج جميع الأسماء من البيانات
+        function extractAllNames(obj, names = []) {
+            if (Array.isArray(obj)) {
+                names.push(...obj);
+            } else if (typeof obj === 'object' && obj !== null) {
+                for (let key in obj) {
+                    if (key !== 'معلومات_عامة' && key !== 'إحصائيات') {
+                        extractAllNames(obj[key], names);
+                    }
+                }
+            }
+            return names;
+        }
+
+        // الحصول على أول حرف من الاسم
+        function getFirstLetter(name) {
+            const cleanName = name.trim().split(' ')[0];
+            let firstLetter = cleanName.charAt(0);
+            
+            // توحيد حروف الألف
+            if (['أ', 'إ', 'آ'].includes(firstLetter)) {
+                firstLetter = 'ا';
+            }
+            
+            return firstLetter;
+        }
+
+        // ترتيب الأسماء أبجدياً
+        function sortNamesByAlphabet(names) {
+            // الأبجدية العربية
+            const arabicOrder = ['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','ه','و','ي'];
+            
+            const grouped = {};
+            
+            names.forEach(name => {
+                const firstLetter = getFirstLetter(name);
+                if (!grouped[firstLetter]) {
+                    grouped[firstLetter] = [];
+                }
+                grouped[firstLetter].push(name);
+            });
+            
+            // ترتيب الأسماء داخل كل مجموعة أبجدياً
+            Object.keys(grouped).forEach(letter => {
+                grouped[letter].sort((a, b) => {
+                    return a.localeCompare(b, 'ar');
+                });
+            });
+            
+            // ترتيب المفاتيح حسب الأبجدية العربية
+            const sortedGrouped = {};
+            arabicOrder.forEach(letter => {
+                if (grouped[letter]) {
+                    sortedGrouped[letter] = grouped[letter];
+                }
+            });
+            
+            return sortedGrouped;
+        }
+
+        // عرض الإحصائيات
+        function displayStats(data) {
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.innerHTML = '';
+            
+            if (!data || !data.إحصائيات) {
+                statsContainer.innerHTML = '<div class="error">لم يتم العثور على الإحصائيات</div>';
+                return;
+            }
+            
+            const stats = data.إحصائيات;
+            
+            // ترتيب القبائل حسب العدد (من الأكبر إلى الأصغر)
+            const sortedStats = Object.entries(stats)
+                .sort((a, b) => b[1] - a[1]);
+            
+            sortedStats.forEach(([tribe, count]) => {
+                const col = document.createElement('div');
+                col.className = 'col-lg-3 col-md-4 col-sm-6';
+                col.innerHTML = `
+                    <div class="stat-card">
+                        <h4>${tribe}</h4>
+                        <div class="number">${count}</div>
+                    </div>
+                `;
+                statsContainer.appendChild(col);
+            });
+        }
+
+        // إنشاء واجهة المستخدم
+        function createUI(groupedNames) {
+            const alphabetButtons = document.getElementById('alphabetButtons');
+            const content = document.getElementById('content');
+            
+            alphabetButtons.innerHTML = '';
+            content.innerHTML = '';
+            
+            const letters = Object.keys(groupedNames);
+            
+            if (letters.length === 0) {
+                content.innerHTML = '<div class="error">لم يتم العثور على أسماء</div>';
+                return;
+            }
+            
+            // إنشاء الأزرار
+            letters.forEach((letter) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-outline-secondary';
+                btn.textContent = letter;
+                btn.onclick = () => showLetter(letter);
+                alphabetButtons.appendChild(btn);
+            });
+            
+            // إنشاء أقسام الحروف
+            letters.forEach(letter => {
+                const section = document.createElement('div');
+                section.className = 'letter-section';
+                section.id = `section-${letter}`;
+                
+                const title = document.createElement('div');
+                title.className = 'letter-title';
+                title.innerHTML = `<span class="badge bg-secondary">${groupedNames[letter].length}</span> ${letter}`;
+                
+                const list = document.createElement('div');
+                list.className = 'names-list';
+                
+                groupedNames[letter].forEach(name => {
+                    const item = document.createElement('div');
+                    item.className = 'name-item';
+                    item.textContent = name;
+                    list.appendChild(item);
+                });
+                
+                section.appendChild(title);
+                section.appendChild(list);
+                content.appendChild(section);
+            });
+            
+            // عرض أول حرف افتراضياً
+            if (letters.length > 0) {
+                showLetter(letters[0]);
+            }
+        }
+
+        // عرض حرف محدد
+        function showLetter(letter) {
+            // إخفاء جميع الأقسام
+            document.querySelectorAll('.letter-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // إزالة التنشيط من جميع الأزرار
+            document.querySelectorAll('#alphabetButtons .btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('btn-outline-secondary');
+                btn.classList.remove('btn-secondary');
+            });
+            
+            // عرض القسم المحدد
+            const section = document.getElementById(`section-${letter}`);
+            if (section) {
+                section.classList.add('active');
+            }
+            
+            // تنشيط الزر المحدد
+            const activeBtn = Array.from(document.querySelectorAll('#alphabetButtons .btn')).find(btn => btn.textContent === letter);
+            if (activeBtn) {
+                activeBtn.classList.remove('btn-outline-secondary');
+                activeBtn.classList.add('btn-secondary', 'active');
+            }
+        }
+
+        // التهيئة الأولية
+        async function init() {
+            try {
+                const data = await loadData();
+                
+                if (!data) {
+                    document.getElementById('content').innerHTML = '<div class="error">خطأ في تحميل البيانات. تأكد من وجود الملف.</div>';
+                    document.getElementById('alphabetButtons').innerHTML = '<div class="error">خطأ في تحميل البيانات</div>';
+                    document.getElementById('statsContainer').innerHTML = '<div class="error">خطأ في تحميل البيانات</div>';
+                    return;
+                }
+                
+                // عرض الإحصائيات
+                displayStats(data);
+                
+                // استخراج وترتيب الأسماء
+                const allNames = extractAllNames(data);
+                const uniqueNames = [...new Set(allNames)];
+                const groupedNames = sortNamesByAlphabet(uniqueNames);
+                
+                createUI(groupedNames);
+                
+                // تحديث العدد الإجمالي
+                document.getElementById('totalCount').textContent = uniqueNames.length;
+                
+            } catch (error) {
+                console.error('خطأ في التهيئة:', error);
+                document.getElementById('content').innerHTML = '<div class="error">حدث خطأ أثناء معالجة البيانات</div>';
+            }
+        }
+
+        // بدء التطبيق
+        init();
+    </script>
+</body>
+</html>
