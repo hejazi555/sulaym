@@ -244,7 +244,7 @@
         // قراءة الملف وجمع جميع الأسماء
         async function loadData() {
             try {
-                const fileContent = await window.fs.readFile('tribal_figures_json (1).json', { encoding: 'utf8' });
+                const fileContent = await window.fs.readFile('tribal_figures_json.json', { encoding: 'utf8' });
                 const data = JSON.parse(fileContent);
                 return data;
             } catch (error) {
@@ -394,4 +394,5 @@
         init();
     </script>
 </body>
+
 </html>
