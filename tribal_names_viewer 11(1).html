@@ -330,7 +330,12 @@
                 
                 switch(mainTribe) {
                     case 'سليم':
-                        title = ' السلمي';
+                        // تحقق إذا كان من بقيل
+                        if (tribePath.includes('بقيل')) {
+                            title = ' البقيلي السلمي';
+                        } else {
+                            title = ' السلمي';
+                        }
                         break;
                     case 'مطير':
                         title = ' المطيري';
