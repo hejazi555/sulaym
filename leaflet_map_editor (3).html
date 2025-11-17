@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الخرائط</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* الشريط الجانبي */
+        .sidebar {
+            width: 380px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar-header {
+            padding: 15px;
+            background: #4CAF50;
+            color: white;
+        }
+        .sidebar-header h1 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 15px;
+            background: white;
+            color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #f0f0f0;
+        }
+        button.danger {
+            background: #f44336;
+            color: white;
+        }
+        button.danger:hover {
+            background: #da190b;
+        }
+        
+        /* التبويبات */
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .tab:hover {
+            background: #e8e8e8;
+        }
+        .tab.active {
+            background: white;
+            border-bottom-color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        /* محتوى التبويبات */
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+        
+        /* قائمة المناطق */
+        .area-item {
+            background: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        .area-item.selected {
+            border-color: #4CAF50;
+            background: #f1f8f4;
+        }
+        .area-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .area-title {
+            font-weight: bold;
+            color: #333;
+        }
+        .area-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .area-actions button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .coords {
+            font-size: 11px;
+            color: #666;
+            background: white;
+            padding: 8px;
+            border-radius: 3px;
+            max-height: 100px;
+            overflow-y: auto;
+            margin-top: 5px;
+        }
+        .coords div {
+            margin: 2px 0;
+        }
+        
+        /* نقاط المساعدة */
+        .helper-item {
+            background: #fff3cd;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border: 1px solid #ffc107;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .helper-item.selected {
+            border-color: #ff9800;
+            background: #ffe5b4;
+        }
+        .helper-info {
+            font-size: 12px;
+            flex: 1;
+        }
+        .helper-coords {
+            color: #856404;
+            font-weight: bold;
+        }
+        
+        /* نموذج إضافة نقطة */
+        .add-helper-form {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .add-helper-form h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .form-actions button {
+            flex: 1;
+        }
+        
+        /* الخريطة */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* تبديل الخرائط */
+        .map-switcher {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        .map-switcher h4 {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .map-switcher label {
+            display: block;
+            padding: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 3px;
+            margin-bottom: 3px;
+        }
+        .map-switcher label:hover {
+            background: #f0f0f0;
+        }
+        .map-switcher input[type="radio"] {
+            margin-left: 8px;
+        }
+        
+        /* أدوات الرسم */
+        .drawing-tools {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        .drawing-tools button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #4CAF50;
+            color: white;
+        }
+        .drawing-tools button:hover {
+            background: #45a049;
+        }
+        .drawing-tools button.active {
+            background: #2196F3;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #1976d2;
+        }
+        
+        /* رفع الملفات */
+        .upload-section {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .upload-section h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-button {
+            display: block;
+            padding: 10px;
+            background: #2196F3;
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .file-input-button:hover {
+            background: #1976D2;
+        }
+        
+        /* ملفات SHP المساعدة */
+        .shp-item {
+            background: #e8f5e9;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border: 1px solid #4CAF50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .shp-info {
+            font-size: 12px;
+            flex: 1;
+        }
+        .shp-name {
+            color: #2E7D32;
+            font-weight: bold;
+        }
+        
+        /* متجاوب */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: 50%;
+                border-left: none;
+                border-top: 1px solid #ddd;
+            }
+            .map-container {
+                height: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        <div id="map"></div>
+        
+        <div class="map-switcher">
+            <h4>نوع الخريطة</h4>
+            <label>
+                <input type="radio" name="maptype" value="google-satellite" checked>
+                Google Satellite
+            </label>
+            <label>
+                <input type="radio" name="maptype" value="esri-satellite">
+                ESRI Satellite
+            </label>
+            <label>
+                <input type="radio" name="maptype" value="mapbox-satellite">
+                Mapbox Satellite
+            </label>
+            <label>
+                <input type="radio" name="maptype" value="osm-standard">
+                OpenStreetMap
+            </label>
+        </div>
+        
+        <div class="drawing-tools">
+            <button id="drawPolygon">🔷 رسم منطقة</button>
+            <button id="addHelper">📍 نقطة مساعدة</button>
+            <button id="stopDrawing">⏹️ إيقاف</button>
+        </div>
+    </div>
+    
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>محرر الخرائط</h1>
+            <div class="controls">
+                <button onclick="saveGeoJSON()">💾 حفظ GeoJSON</button>
+                <button class="danger" onclick="clearAll()">🗑️ مسح الكل</button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('areas')">المناطق</div>
+            <div class="tab" onclick="switchTab('helpers')">نقاط المساعدة</div>
+            <div class="tab" onclick="switchTab('shp')">ملفات SHP</div>
+        </div>
+        
+        <div class="tab-content">
+            <div id="areas-panel" class="tab-panel active">
+                <div class="info-box">
+                    💡 المناطق ثابتة ولا تتحرك. اضغط Q لحذف المحدد
+                </div>
+                <div id="areasList"></div>
+            </div>
+            <div id="helpers-panel" class="tab-panel">
+                <div class="add-helper-form">
+                    <h3>إضافة نقطة مساعدة</h3>
+                    <div class="form-group">
+                        <label>خط العرض (Latitude)</label>
+                        <input type="number" id="helperLat" step="any" placeholder="24.7136">
+                    </div>
+                    <div class="form-group">
+                        <label>خط الطول (Longitude)</label>
+                        <input type="number" id="helperLng" step="any" placeholder="46.6753">
+                    </div>
+                    <div class="form-actions">
+                        <button onclick="addHelperByCoords()">➕ إضافة</button>
+                        <button onclick="clearHelperForm()">🔄 مسح</button>
+                    </div>
+                </div>
+                <div class="info-box">
+                    💡 النقاط قابلة للسحب والتحريك. اضغط Q لحذف المحددة
+                </div>
+                <div id="helpersList"></div>
+            </div>
+            <div id="shp-panel" class="tab-panel">
+                <div class="upload-section">
+                    <h3>رفع ملفات SHP مساعدة</h3>
+                    <div class="file-input-wrapper">
+                        <label class="file-input-button">
+                            📁 اختر ملفات SHP (.shp, .shx, .dbf, .prj)
+                            <input type="file" id="shpFileInput" accept=".shp,.shx,.dbf,.prj" multiple onchange="handleShpUpload(event)">
+                        </label>
+                    </div>
+                </div>
+                <div class="info-box">
+                    💡 اختر الملفات معاً: .shp و .shx و .dbf (مطلوبة) و .prj (اختياري)<br>
+                    هذه الملفات للمساعدة فقط ولا تُحفظ في GeoJSON
+                </div>
+                <div id="shpList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shpjs/4.0.4/shp.min.js"></script>
+    <script>
+        let map;
+        let currentLayer;
+        let areas = [];
+        let helperMarkers = [];
+        let shpLayers = [];
+        let currentDrawingMode = null;
+        let drawingPolygon = null;
+        let tempMarkers = [];
+        let selectedArea = null;
+        let selectedHelper = null;
+        
+        // خرائط الستالايت المختلفة
+        const mapLayers = {
+            'google-satellite': L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                attribution: 'Google',
+                maxZoom: 20
+            }),
+            'esri-satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'ESRI',
+                maxZoom: 19
+            }),
+            'mapbox-satellite': L.tileLayer('https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.jpg?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                attribution: 'Mapbox',
+                maxZoom: 19
+            }),
+            'osm-standard': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            })
+        };
+        
+        // تهيئة الخريطة
+        function initMap() {
+            map = L.map('map').setView([24.7136, 46.6753], 6);
+            currentLayer = mapLayers['google-satellite'].addTo(map);
+            
+            // تبديل الخرائط
+            document.querySelectorAll('input[name="maptype"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (currentLayer) {
+                        map.removeLayer(currentLayer);
+                    }
+                    currentLayer = mapLayers[this.value].addTo(map);
+                });
+            });
+            
+            // النقر على الخريطة
+            map.on('click', function(e) {
+                if (currentDrawingMode === 'polygon') {
+                    addPolygonPoint(e.latlng);
+                } else if (currentDrawingMode === 'helper') {
+                    addHelperMarker(e.latlng);
+                }
+            });
+            
+            // مستمع لوحة المفاتيح
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'q' || e.key === 'Q') {
+                    if (selectedArea !== null) {
+                        deleteArea(selectedArea);
+                    } else if (selectedHelper !== null) {
+                        deleteHelper(selectedHelper);
+                    }
+                }
+            });
+        }
+        
+        // إضافة نقطة للمضلع
+        function addPolygonPoint(latlng) {
+            const marker = L.circleMarker(latlng, {
+                radius: 6,
+                fillColor: '#4CAF50',
+                color: '#2E7D32',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8,
+                draggable: true
+            }).addTo(map);
+            
+            const markerIndex = tempMarkers.length;
+            tempMarkers.push({marker: marker, latlng: latlng});
+            
+            // تحديث الموقع عند السحب
+            marker.on('drag', function(e) {
+                const newLatLng = e.target.getLatLng();
+                tempMarkers[markerIndex].latlng = newLatLng;
+                if (drawingPolygon) {
+                    drawingPolygon.setLatLngs(tempMarkers.map(m => m.latlng));
+                }
+            });
+            
+            if (tempMarkers.length > 1) {
+                if (!drawingPolygon) {
+                    const latlngs = tempMarkers.map(m => m.latlng);
+                    drawingPolygon = L.polygon(latlngs, {
+                        fillColor: '#4CAF50',
+                        fillOpacity: 0.4,
+                        color: '#2E7D32',
+                        weight: 2
+                    }).addTo(map);
+                } else {
+                    drawingPolygon.setLatLngs(tempMarkers.map(m => m.latlng));
+                }
+            }
+        }
+        
+        // إنهاء رسم المضلع
+        function finishPolygon() {
+            if (tempMarkers.length < 3) {
+                alert('يجب إضافة 3 نقاط على الأقل');
+                return;
+            }
+            
+            const latlngs = tempMarkers.map(m => m.latlng);
+            const polygon = L.polygon(latlngs, {
+                fillColor: '#4CAF50',
+                fillOpacity: 0.4,
+                color: '#2E7D32',
+                weight: 2
+            }).addTo(map);
+            
+            // إزالة المؤقتات
+            tempMarkers.forEach(m => map.removeLayer(m.marker));
+            if (drawingPolygon) map.removeLayer(drawingPolygon);
+            tempMarkers = [];
+            drawingPolygon = null;
+            
+            addArea(polygon);
+            stopDrawing();
+        }
+        
+        // إضافة منطقة
+        function addArea(polygon) {
+            const id = 'area_' + Date.now();
+            
+            // إنشاء نقاط قابلة للتحريك للمنطقة
+            const editMarkers = [];
+            const latlngs = polygon.getLatLngs()[0];
+            
+            latlngs.forEach((latlng, index) => {
+                const marker = L.circleMarker(latlng, {
+                    radius: 6,
+                    fillColor: '#4CAF50',
+                    color: '#2E7D32',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8,
+                    draggable: true
+                }).addTo(map);
+                
+                marker.on('drag', function(e) {
+                    const newLatLng = e.target.getLatLng();
+                    const currentLatlngs = polygon.getLatLngs()[0];
+                    currentLatlngs[index] = newLatLng;
+                    polygon.setLatLngs(currentLatlngs);
+                    updateAreasList();
+                });
+                
+                editMarkers.push(marker);
+            });
+            
+            const area = {
+                id: id,
+                polygon: polygon,
+                markers: editMarkers
+            };
+            areas.push(area);
+            
+            polygon.on('click', function() {
+                selectArea(id);
+            });
+            
+            updateAreasList();
+        }
+        
+        // تحديد منطقة
+        function selectArea(id) {
+            selectedArea = id;
+            selectedHelper = null;
+            
+            areas.forEach(area => {
+                if (area.id === id) {
+                    area.polygon.setStyle({color: '#FF5722', weight: 3});
+                } else {
+                    area.polygon.setStyle({color: '#2E7D32', weight: 2});
+                }
+            });
+            
+            updateAreasList();
+        }
+        
+        // حذف منطقة
+        function deleteArea(id) {
+            const index = areas.findIndex(a => a.id === id);
+            if (index > -1) {
+                map.removeLayer(areas[index].polygon);
+                // حذف النقاط القابلة للتحريك
+                areas[index].markers.forEach(marker => map.removeLayer(marker));
+                areas.splice(index, 1);
+                selectedArea = null;
+                updateAreasList();
+            }
+        }
+        
+        // التركيز على منطقة
+        function focusArea(id) {
+            const area = areas.find(a => a.id === id);
+            if (area) {
+                map.fitBounds(area.polygon.getBounds());
+                selectArea(id);
+            }
+        }
+        
+        // إضافة نقطة مساعدة
+        function addHelperMarker(latlng) {
+            const marker = L.circleMarker(latlng, {
+                radius: 8,
+                fillColor: '#FFC107',
+                color: '#FF9800',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8,
+                draggable: true
+            }).addTo(map);
+            
+            const index = helperMarkers.length;
+            helperMarkers.push({marker: marker, latlng: latlng});
+            
+            marker.on('click', function() {
+                selectHelper(index);
+            });
+            
+            marker.on('drag', function(e) {
+                helperMarkers[index].latlng = e.target.getLatLng();
+                updateHelpersList();
+            });
+            
+            updateHelpersList();
+        }
+        
+        // إضافة نقطة بالإحداثيات
+        function addHelperByCoords() {
+            const lat = parseFloat(document.getElementById('helperLat').value);
+            const lng = parseFloat(document.getElementById('helperLng').value);
+            
+            if (isNaN(lat) || isNaN(lng)) {
+                alert('الرجاء إدخال إحداثيات صحيحة');
+                return;
+            }
+            
+            addHelperMarker(L.latLng(lat, lng));
+            clearHelperForm();
+            map.setView([lat, lng], 13);
+        }
+        
+        // مسح نموذج النقطة
+        function clearHelperForm() {
+            document.getElementById('helperLat').value = '';
+            document.getElementById('helperLng').value = '';
+        }
+        
+        // تحديد نقطة مساعدة
+        function selectHelper(index) {
+            selectedHelper = index;
+            selectedArea = null;
+            
+            helperMarkers.forEach((h, i) => {
+                if (i === index) {
+                    h.marker.setStyle({color: '#FF5722', weight: 3});
+                } else {
+                    h.marker.setStyle({color: '#FF9800', weight: 2});
+                }
+            });
+            
+            updateHelpersList();
+        }
+        
+        // حذف نقطة مساعدة
+        function deleteHelper(index) {
+            if (index < 0 || index >= helperMarkers.length) return;
+            
+            map.removeLayer(helperMarkers[index].marker);
+            helperMarkers.splice(index, 1);
+            selectedHelper = null;
+            updateHelpersList();
+        }
+        
+        // تحديث قائمة المناطق
+        function updateAreasList() {
+            const list = document.getElementById('areasList');
+            if (areas.length === 0) {
+                list.innerHTML = '<div class="empty-state">لا توجد مناطق محددة<br>استخدم "رسم منطقة" لإضافة مناطق</div>';
+                return;
+            }
+            
+            list.innerHTML = areas.map((area, index) => {
+                const coords = area.polygon.getLatLngs()[0];
+                const coordsHtml = coords.map((c, i) => 
+                    `<div>${i + 1}. ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}</div>`
+                ).join('');
+                
+                const isSelected = area.id === selectedArea;
+                
+                return `
+                    <div class="area-item ${isSelected ? 'selected' : ''}" onclick="selectArea('${area.id}')">
+                        <div class="area-header">
+                            <span class="area-title">منطقة ${index + 1}</span>
+                            <div class="area-actions">
+                                <button onclick="event.stopPropagation(); focusArea('${area.id}')">📍</button>
+                                <button class="danger" onclick="event.stopPropagation(); deleteArea('${area.id}')">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="coords">${coordsHtml}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // تحديث قائمة نقاط المساعدة
+        function updateHelpersList() {
+            const list = document.getElementById('helpersList');
+            if (helperMarkers.length === 0) {
+                list.innerHTML = '<div class="empty-state">لا توجد نقاط مساعدة</div>';
+                return;
+            }
+            
+            list.innerHTML = helperMarkers.map((h, index) => {
+                const isSelected = index === selectedHelper;
+                return `
+                    <div class="helper-item ${isSelected ? 'selected' : ''}" onclick="selectHelper(${index})">
+                        <div class="helper-info">
+                            <div>نقطة ${index + 1}</div>
+                            <div class="helper-coords">${h.latlng.lat.toFixed(6)}, ${h.latlng.lng.toFixed(6)}</div>
+                        </div>
+                        <button class="danger" onclick="event.stopPropagation(); deleteHelper(${index})">🗑️</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // حفظ GeoJSON
+        function saveGeoJSON() {
+            if (areas.length === 0) {
+                alert('لا توجد مناطق للحفظ');
+                return;
+            }
+            
+            const features = areas.map(area => {
+                const coords = area.polygon.getLatLngs()[0].map(c => [c.lng, c.lat]);
+                coords.push(coords[0]);
+                
+                return {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [coords]
+                    }
+                };
+            });
+            
+            const geojson = {
+                type: 'FeatureCollection',
+                features: features
+            };
+            
+            const dataStr = JSON.stringify(geojson, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'map_data.geojson';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // مسح الكل
+        function clearAll() {
+            if (!confirm('هل تريد حذف جميع المناطق ونقاط المساعدة؟')) return;
+            
+            areas.forEach(area => map.removeLayer(area.polygon));
+            areas = [];
+            selectedArea = null;
+            
+            helperMarkers.forEach(h => map.removeLayer(h.marker));
+            helperMarkers = [];
+            selectedHelper = null;
+            
+            updateAreasList();
+            updateHelpersList();
+        }
+        
+        // التبديل بين التبويبات
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-panel').classList.add('active');
+        }
+        
+        // أزرار الرسم
+        document.getElementById('drawPolygon').addEventListener('click', function() {
+            stopDrawing();
+            currentDrawingMode = 'polygon';
+            this.classList.add('active');
+        });
+        
+        document.getElementById('addHelper').addEventListener('click', function() {
+            stopDrawing();
+            currentDrawingMode = 'helper';
+            this.classList.add('active');
+        });
+        
+        document.getElementById('stopDrawing').addEventListener('click', stopDrawing);
+        
+        function stopDrawing() {
+            if (currentDrawingMode === 'polygon' && tempMarkers.length >= 3) {
+                finishPolygon();
+            } else {
+                tempMarkers.forEach(m => map.removeLayer(m.marker));
+                if (drawingPolygon) map.removeLayer(drawingPolygon);
+                tempMarkers = [];
+                drawingPolygon = null;
+            }
+            
+            currentDrawingMode = null;
+            document.querySelectorAll('.drawing-tools button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+        
+        // تهيئة عند التحميل
+        window.addEventListener('load', initMap);
+        
+        // رفع ملف SHP
+        async function handleShpUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const geojson = await shp(arrayBuffer);
+                
+                const layer = L.geoJSON(geojson, {
+                    style: {
+                        fillColor: '#9C27B0',
+                        fillOpacity: 0.3,
+                        color: '#7B1FA2',
+                        weight: 2,
+                        dashArray: '5, 5'
+                    },
+                    pointToLayer: function(feature, latlng) {
+                        return L.circleMarker(latlng, {
+                            radius: 6,
+                            fillColor: '#9C27B0',
+                            color: '#7B1FA2',
+                            weight: 2,
+                            opacity: 1,
+                            fillOpacity: 0.6
+                        });
+                    }
+                }).addTo(map);
+                
+                const id = 'shp_' + Date.now();
+                shpLayers.push({
+                    id: id,
+                    name: file.name,
+                    layer: layer,
+                    geojson: geojson
+                });
+                
+                // التركيز على الطبقة
+                map.fitBounds(layer.getBounds());
+                
+                updateShpList();
+                
+                // مسح المدخل
+                event.target.value = '';
+                
+            } catch (error) {
+                alert('خطأ في قراءة ملف SHP: ' + error.message);
+                console.error(error);
+            }
+        }
+        
+        // حذف ملف SHP
+        function deleteShpLayer(id) {
+            const index = shpLayers.findIndex(s => s.id === id);
+            if (index > -1) {
+                map.removeLayer(shpLayers[index].layer);
+                shpLayers.splice(index, 1);
+                updateShpList();
+            }
+        }
+        
+        // التركيز على ملف SHP
+        function focusShpLayer(id) {
+            const shp = shpLayers.find(s => s.id === id);
+            if (shp) {
+                map.fitBounds(shp.layer.getBounds());
+            }
+        }
+        
+        // تحديث قائمة ملفات SHP
+        function updateShpList() {
+            const list = document.getElementById('shpList');
+            if (shpLayers.length === 0) {
+                list.innerHTML = '<div class="empty-state">لا توجد ملفات SHP محملة</div>';
+                return;
+            }
+            
+            list.innerHTML = shpLayers.map((shp, index) => {
+                const featureCount = shp.geojson.features ? shp.geojson.features.length : 
+                                   (shp.geojson.type === 'FeatureCollection' ? shp.geojson.features.length : 1);
+                
+                return `
+                    <div class="shp-item">
+                        <div class="shp-info">
+                            <div class="shp-name">${shp.name}</div>
+                            <div style="color: #666; font-size: 11px; margin-top: 3px;">
+                                ${featureCount} عنصر
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 5px;">
+                            <button onclick="focusShpLayer('${shp.id}')" style="padding: 5px 10px; font-size: 12px;">📍</button>
+                            <button class="danger" onclick="deleteShpLayer('${shp.id}')" style="padding: 5px 10px; font-size: 12px;">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>
