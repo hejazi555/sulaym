@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الخرائط - Google Maps</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* الشريط الجانبي */
+        .sidebar {
+            width: 350px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar-header {
+            padding: 15px;
+            background: #4CAF50;
+            color: white;
+        }
+        .sidebar-header h1 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 15px;
+            background: white;
+            color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #f0f0f0;
+        }
+        button.danger {
+            background: #f44336;
+            color: white;
+        }
+        button.danger:hover {
+            background: #da190b;
+        }
+        
+        /* التبويبات */
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab:hover {
+            background: #e8e8e8;
+        }
+        .tab.active {
+            background: white;
+            border-bottom-color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        /* محتوى التبويبات */
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+        
+        /* قائمة المناطق */
+        .area-item {
+            background: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        .area-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .area-title {
+            font-weight: bold;
+            color: #333;
+        }
+        .area-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .area-actions button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .coords {
+            font-size: 11px;
+            color: #666;
+            background: white;
+            padding: 8px;
+            border-radius: 3px;
+            max-height: 100px;
+            overflow-y: auto;
+            margin-top: 5px;
+        }
+        .coords div {
+            margin: 2px 0;
+        }
+        
+        /* نقاط المساعدة */
+        .helper-item {
+            background: #fff3cd;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border: 1px solid #ffc107;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .helper-info {
+            font-size: 12px;
+        }
+        .helper-coords {
+            color: #856404;
+            font-weight: bold;
+        }
+        
+        /* الخريطة */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* أدوات الرسم */
+        .drawing-tools {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        .drawing-tools button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            background: #4CAF50;
+            color: white;
+        }
+        .drawing-tools button:hover {
+            background: #45a049;
+        }
+        .drawing-tools button.active {
+            background: #2196F3;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        /* متجاوب */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: 40%;
+                border-left: none;
+                border-top: 1px solid #ddd;
+            }
+            .map-container {
+                height: 60%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        <div id="map"></div>
+        <div class="drawing-tools">
+            <button id="drawPolygon">رسم مضلع</button>
+            <button id="addHelper">نقطة مساعدة</button>
+            <button id="stopDrawing">إيقاف الرسم</button>
+        </div>
+    </div>
+    
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>محرر الخرائط</h1>
+            <div class="controls">
+                <button onclick="saveGeoJSON()">💾 حفظ GeoJSON</button>
+                <button class="danger" onclick="clearAll()">🗑️ مسح الكل</button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('areas')">المناطق</div>
+            <div class="tab" onclick="switchTab('helpers')">نقاط المساعدة</div>
+        </div>
+        
+        <div class="tab-content">
+            <div id="areas-panel" class="tab-panel active">
+                <div id="areasList"></div>
+            </div>
+            <div id="helpers-panel" class="tab-panel">
+                <div id="helpersList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=&libraries=drawing"></script>
+    <script>
+        let map;
+        let drawingManager;
+        let areas = [];
+        let helperMarkers = [];
+        let currentDrawingMode = null;
+        
+        // تهيئة الخريطة
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 24.7136, lng: 46.6753 },
+                zoom: 6,
+                mapTypeId: 'roadmap',
+                streetViewControl: false,
+                mapTypeControl: true
+            });
+            
+            // مدير الرسم
+            drawingManager = new google.maps.drawing.DrawingManager({
+                drawingMode: null,
+                drawingControl: false,
+                polygonOptions: {
+                    fillColor: '#4CAF50',
+                    fillOpacity: 0.4,
+                    strokeWeight: 2,
+                    strokeColor: '#2E7D32',
+                    editable: true,
+                    draggable: true
+                }
+            });
+            drawingManager.setMap(map);
+            
+            // عند اكتمال الرسم
+            google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
+                addArea(polygon);
+                drawingManager.setDrawingMode(null);
+                updateButtons();
+            });
+            
+            // النقر لإضافة نقاط مساعدة
+            map.addListener('click', function(e) {
+                if (currentDrawingMode === 'helper') {
+                    addHelperMarker(e.latLng);
+                }
+            });
+        }
+        
+        // إضافة منطقة
+        function addArea(polygon) {
+            const id = 'area_' + Date.now();
+            const area = {
+                id: id,
+                polygon: polygon,
+                type: 'polygon'
+            };
+            areas.push(area);
+            
+            // إضافة مستمعين للتعديل
+            google.maps.event.addListener(polygon.getPath(), 'set_at', updateAreasList);
+            google.maps.event.addListener(polygon.getPath(), 'insert_at', updateAreasList);
+            
+            updateAreasList();
+        }
+        
+        // إضافة نقطة مساعدة
+        function addHelperMarker(latLng) {
+            const marker = new google.maps.Marker({
+                position: latLng,
+                map: map,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 8,
+                    fillColor: '#FFC107',
+                    fillOpacity: 0.8,
+                    strokeColor: '#FF9800',
+                    strokeWeight: 2
+                },
+                draggable: true
+            });
+            
+            marker.addListener('drag', updateHelpersList);
+            
+            helperMarkers.push(marker);
+            updateHelpersList();
+        }
+        
+        // حذف منطقة
+        function deleteArea(id) {
+            const index = areas.findIndex(a => a.id === id);
+            if (index > -1) {
+                areas[index].polygon.setMap(null);
+                areas.splice(index, 1);
+                updateAreasList();
+            }
+        }
+        
+        // التركيز على منطقة
+        function focusArea(id) {
+            const area = areas.find(a => a.id === id);
+            if (area) {
+                const bounds = new google.maps.LatLngBounds();
+                area.polygon.getPath().forEach(coord => bounds.extend(coord));
+                map.fitBounds(bounds);
+            }
+        }
+        
+        // حذف نقطة مساعدة
+        function deleteHelper(index) {
+            helperMarkers[index].setMap(null);
+            helperMarkers.splice(index, 1);
+            updateHelpersList();
+        }
+        
+        // تحديث قائمة المناطق
+        function updateAreasList() {
+            const list = document.getElementById('areasList');
+            if (areas.length === 0) {
+                list.innerHTML = '<div class="empty-state">لا توجد مناطق محددة<br>استخدم أدوات الرسم لإضافة مناطق</div>';
+                return;
+            }
+            
+            list.innerHTML = areas.map((area, index) => {
+                const coords = [];
+                area.polygon.getPath().forEach(coord => {
+                    coords.push({ lat: coord.lat(), lng: coord.lng() });
+                });
+                
+                const coordsHtml = coords.map((c, i) => 
+                    `<div>${i + 1}. ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}</div>`
+                ).join('');
+                
+                return `
+                    <div class="area-item">
+                        <div class="area-header">
+                            <span class="area-title">منطقة ${index + 1}</span>
+                            <div class="area-actions">
+                                <button onclick="focusArea('${area.id}')">📍</button>
+                                <button class="danger" onclick="deleteArea('${area.id}')">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="coords">${coordsHtml}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // تحديث قائمة نقاط المساعدة
+        function updateHelpersList() {
+            const list = document.getElementById('helpersList');
+            if (helperMarkers.length === 0) {
+                list.innerHTML = '<div class="empty-state">لا توجد نقاط مساعدة<br>اضغط على "نقطة مساعدة" ثم اضغط على الخريطة</div>';
+                return;
+            }
+            
+            list.innerHTML = helperMarkers.map((marker, index) => {
+                const pos = marker.getPosition();
+                return `
+                    <div class="helper-item">
+                        <div class="helper-info">
+                            <div>نقطة ${index + 1}</div>
+                            <div class="helper-coords">${pos.lat().toFixed(6)}, ${pos.lng().toFixed(6)}</div>
+                        </div>
+                        <button class="danger" onclick="deleteHelper(${index})">🗑️</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // حفظ GeoJSON
+        function saveGeoJSON() {
+            if (areas.length === 0) {
+                alert('لا توجد مناطق للحفظ');
+                return;
+            }
+            
+            const features = areas.map(area => {
+                const coords = [];
+                area.polygon.getPath().forEach(coord => {
+                    coords.push([coord.lng(), coord.lat()]);
+                });
+                coords.push(coords[0]); // إغلاق المضلع
+                
+                return {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [coords]
+                    }
+                };
+            });
+            
+            const geojson = {
+                type: 'FeatureCollection',
+                features: features
+            };
+            
+            const dataStr = JSON.stringify(geojson, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'map_data.geojson';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // مسح الكل
+        function clearAll() {
+            if (!confirm('هل تريد حذف جميع المناطق ونقاط المساعدة؟')) return;
+            
+            areas.forEach(area => area.polygon.setMap(null));
+            areas = [];
+            
+            helperMarkers.forEach(marker => marker.setMap(null));
+            helperMarkers = [];
+            
+            updateAreasList();
+            updateHelpersList();
+        }
+        
+        // التبديل بين التبويبات
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-panel').classList.add('active');
+        }
+        
+        // أزرار الرسم
+        function updateButtons() {
+            document.querySelectorAll('.drawing-tools button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+        
+        document.getElementById('drawPolygon').addEventListener('click', function() {
+            drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+            currentDrawingMode = 'polygon';
+            this.classList.add('active');
+        });
+        
+        document.getElementById('addHelper').addEventListener('click', function() {
+            drawingManager.setDrawingMode(null);
+            currentDrawingMode = 'helper';
+            this.classList.add('active');
+        });
+        
+        document.getElementById('stopDrawing').addEventListener('click', function() {
+            drawingManager.setDrawingMode(null);
+            currentDrawingMode = null;
+            updateButtons();
+        });
+        
+        // تهيئة عند التحميل
+        window.addEventListener('load', initMap);
+    </script>
+</body>
+</html>
