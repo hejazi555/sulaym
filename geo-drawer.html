@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoJSON رسام الأشكال</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+
+<style>
+  :root {
+    --bg: #0d0f14;
+    --panel: #13161e;
+    --border: #1e2330;
+    --accent: #00e5a0;
+    --accent2: #0066ff;
+    --warn: #ff6b35;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card: #181c27;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ─── Header ─── */
+  header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    z-index: 1000;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.3px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .badge {
+    background: var(--border);
+    color: var(--muted);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  /* ─── Main Layout ─── */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: 300px;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .sidebar-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 12px;
+  }
+
+  /* ─── Stats ─── */
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* ─── Buttons ─── */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.18s ease;
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .btn:last-child { margin-bottom: 0; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #00b37e);
+    color: #0d0f14;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-danger {
+    background: var(--card);
+    color: #ff6b6b;
+    border: 1px solid var(--border);
+  }
+  .btn-danger:hover { border-color: #ff6b6b; background: rgba(255,107,107,0.08); }
+
+  /* ─── Features List ─── */
+  .features-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+  }
+
+  .features-list::-webkit-scrollbar { width: 4px; }
+  .features-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .feature-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.15s;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .feature-item:hover { border-color: var(--accent2); }
+  .feature-item.selected { border-color: var(--accent); background: rgba(0,229,160,0.06); }
+
+  .feature-info { flex: 1; }
+
+  .feature-type {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .feature-id {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .feature-del {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.15s;
+    font-size: 14px;
+  }
+  .feature-del:hover { color: #ff6b6b; }
+
+  .empty-state {
+    text-align: center;
+    padding: 30px 16px;
+    color: var(--muted);
+  }
+
+  .empty-icon { font-size: 32px; margin-bottom: 8px; }
+  .empty-text { font-size: 12px; line-height: 1.5; }
+
+  /* ─── Map Container ─── */
+  #map {
+    flex: 1;
+    background: #1a1d28;
+  }
+
+  /* ─── Leaflet overrides ─── */
+  .leaflet-control-zoom a,
+  .leaflet-draw-toolbar a {
+    background: var(--panel) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+  }
+
+  .leaflet-control-zoom a:hover,
+  .leaflet-draw-toolbar a:hover {
+    background: var(--card) !important;
+    color: var(--accent) !important;
+  }
+
+  .leaflet-draw-toolbar a.leaflet-draw-draw-polygon { color: var(--accent) !important; }
+  .leaflet-draw-toolbar a.leaflet-draw-draw-rectangle { color: var(--accent2) !important; }
+
+  /* ─── GeoJSON Modal ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 720px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: popIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .modal-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-body { flex: 1; overflow: auto; padding: 16px 20px; }
+
+  pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 12px;
+    color: #a8d8b8;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  .modal-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .modal-footer .btn { width: auto; margin-bottom: 0; }
+
+  /* ─── Notification ─── */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 99999;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── Type color tags ─── */
+  .type-polygon { color: var(--accent); }
+  .type-rectangle { color: var(--accent2); }
+  .type-polyline { color: var(--warn); }
+  .type-circle { color: #a855f7; }
+  .type-marker { color: #facc15; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🗺</div>
+    <span class="logo-text">GeoJSON Drawer</span>
+  </div>
+  <div class="header-actions">
+    <span class="badge">Leaflet 1.9</span>
+    <span class="badge">→ Shapefile</span>
+  </div>
+</header>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Map -->
+  <div id="map"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+
+    <!-- Stats -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">إحصائيات</div>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-value" id="count">0</div>
+          <div class="stat-label">أشكال</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="layerType">—</div>
+          <div class="stat-label">آخر نوع</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">تصدير</div>
+      <button class="btn btn-primary" onclick="showGeoJSON()">
+        <span>📋</span> عرض GeoJSON
+      </button>
+      <button class="btn btn-secondary" onclick="downloadGeoJSON()">
+        <span>⬇</span> تحميل .geojson
+      </button>
+      <button class="btn btn-danger" onclick="clearAll()">
+        <span>🗑</span> مسح الكل
+      </button>
+    </div>
+
+    <!-- Features list -->
+    <div class="sidebar-title" style="padding: 12px 16px 4px; font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.8px;">الأشكال المرسومة</div>
+    <div class="features-list" id="featuresList">
+      <div class="empty-state">
+        <div class="empty-icon">✏️</div>
+        <div class="empty-text">استخدم أدوات الرسم على الخريطة لإضافة أشكال</div>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- GeoJSON Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📄 GeoJSON Output</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <pre id="geojsonOutput"></pre>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="copyGeoJSON()" style="padding:8px 16px">نسخ</button>
+      <button class="btn btn-primary" onclick="downloadGeoJSON()" style="padding:8px 16px">⬇ تحميل</button>
+      <button class="btn btn-danger" onclick="closeModal()" style="padding:8px 16px">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+<script>
+// ── Map Init ──
+const map = L.map('map', {
+  center: [24.7, 46.7],
+  zoom: 6,
+  zoomControl: false
+});
+
+L.control.zoom({ position: 'topright' }).addTo(map);
+
+// Dark tile layer (CartoDB Dark)
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '©OpenStreetMap ©CartoDB',
+  maxZoom: 20
+}).addTo(map);
+
+// ── Draw Layer ──
+const drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+
+const drawControl = new L.Control.Draw({
+  position: 'topleft',
+  draw: {
+    polygon: {
+      shapeOptions: { color: '#00e5a0', fillColor: '#00e5a0', fillOpacity: 0.25, weight: 2 },
+      allowIntersection: false
+    },
+    rectangle: {
+      shapeOptions: { color: '#0066ff', fillColor: '#0066ff', fillOpacity: 0.2, weight: 2 }
+    },
+    polyline: {
+      shapeOptions: { color: '#ff6b35', weight: 3 }
+    },
+    circle: {
+      shapeOptions: { color: '#a855f7', fillColor: '#a855f7', fillOpacity: 0.2, weight: 2 }
+    },
+    marker: true,
+    circlemarker: false
+  },
+  edit: {
+    featureGroup: drawnItems,
+    poly: { allowIntersection: false }
+  }
+});
+map.addControl(drawControl);
+
+// ── State ──
+let features = [];
+let featureCounter = 0;
+let selectedId = null;
+
+// ── Events ──
+map.on(L.Draw.Event.CREATED, function(e) {
+  const layer = e.layer;
+  const type = e.layerType;
+  featureCounter++;
+  const id = featureCounter;
+
+  layer._featureId = id;
+  drawnItems.addLayer(layer);
+
+  const geoType = getGeoType(type, layer);
+  features.push({ id, type, geoType, layer });
+  updateStats(type);
+  renderList();
+  showToast(`✅ تم إضافة ${getArabicType(type)}`);
+});
+
+map.on(L.Draw.Event.EDITED, function(e) {
+  e.layers.eachLayer(layer => {
+    const f = features.find(f => f.layer === layer);
+    if (f) f.layer = layer;
+  });
+  renderList();
+  showToast('✏️ تم تحديث الأشكال');
+});
+
+map.on(L.Draw.Event.DELETED, function(e) {
+  e.layers.eachLayer(layer => {
+    features = features.filter(f => f.layer !== layer);
+  });
+  updateStats();
+  renderList();
+  showToast('🗑 تم الحذف');
+});
+
+// ── Helpers ──
+function getGeoType(type, layer) {
+  if (type === 'marker') return 'Point';
+  if (type === 'polyline') return 'LineString';
+  if (type === 'circle') return 'Polygon (Circle)';
+  return 'Polygon';
+}
+
+function getArabicType(type) {
+  const map = {
+    polygon: 'مضلع', rectangle: 'مستطيل',
+    polyline: 'خط', circle: 'دائرة', marker: 'نقطة'
+  };
+  return map[type] || type;
+}
+
+function getTypeClass(type) {
+  return `type-${type}`;
+}
+
+function getTypeIcon(type) {
+  const icons = {
+    polygon: '⬡', rectangle: '▭', polyline: '〰', circle: '○', marker: '📍'
+  };
+  return icons[type] || '◇';
+}
+
+function updateStats(lastType) {
+  document.getElementById('count').textContent = features.length;
+  if (lastType) document.getElementById('layerType').textContent = getArabicType(lastType);
+  if (features.length === 0) document.getElementById('layerType').textContent = '—';
+}
+
+function renderList() {
+  const el = document.getElementById('featuresList');
+  if (features.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">✏️</div><div class="empty-text">استخدم أدوات الرسم على الخريطة لإضافة أشكال</div></div>`;
+    return;
+  }
+  el.innerHTML = features.map(f => `
+    <div class="feature-item ${f.id === selectedId ? 'selected' : ''}" onclick="selectFeature(${f.id})">
+      <div class="feature-info">
+        <div class="feature-type ${getTypeClass(f.type)}">${getTypeIcon(f.type)} ${getArabicType(f.type)}</div>
+        <div class="feature-id">ID: #${f.id} · ${f.geoType}</div>
+      </div>
+      <button class="feature-del" onclick="deleteFeature(event, ${f.id})" title="حذف">✕</button>
+    </div>
+  `).join('');
+}
+
+function selectFeature(id) {
+  selectedId = id;
+  const f = features.find(f => f.id === id);
+  if (f && f.layer.getBounds) map.fitBounds(f.layer.getBounds(), { padding: [60, 60] });
+  else if (f && f.layer.getLatLng) map.setView(f.layer.getLatLng(), 14);
+  renderList();
+}
+
+function deleteFeature(e, id) {
+  e.stopPropagation();
+  const f = features.find(f => f.id === id);
+  if (f) {
+    drawnItems.removeLayer(f.layer);
+    features = features.filter(f => f.id !== id);
+    if (selectedId === id) selectedId = null;
+    updateStats();
+    renderList();
+    showToast('🗑 تم حذف الشكل');
+  }
+}
+
+// ── GeoJSON Builder ──
+function buildGeoJSON() {
+  const geoFeatures = features.map(f => {
+    let geom;
+    try {
+      if (f.type === 'circle') {
+        // Convert circle to polygon approximation
+        const center = f.layer.getLatLng();
+        const radius = f.layer.getRadius();
+        const points = 64;
+        const coords = [];
+        for (let i = 0; i <= points; i++) {
+          const angle = (i / points) * 2 * Math.PI;
+          const lat = center.lat + (radius / 111320) * Math.cos(angle);
+          const lng = center.lng + (radius / (111320 * Math.cos(center.lat * Math.PI / 180))) * Math.sin(angle);
+          coords.push([lng, lat]);
+        }
+        geom = { type: 'Polygon', coordinates: [coords] };
+      } else {
+        geom = f.layer.toGeoJSON().geometry;
+      }
+    } catch(e) {
+      geom = null;
+    }
+    return {
+      type: 'Feature',
+      properties: { id: f.id, shape_type: f.type },
+      geometry: geom
+    };
+  });
+
+  return {
+    type: 'FeatureCollection',
+    features: geoFeatures
+  };
+}
+
+function showGeoJSON() {
+  if (features.length === 0) { showToast('⚠️ لا توجد أشكال بعد'); return; }
+  const gj = buildGeoJSON();
+  document.getElementById('geojsonOutput').textContent = JSON.stringify(gj, null, 2);
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function copyGeoJSON() {
+  const text = document.getElementById('geojsonOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('📋 تم النسخ!'));
+}
+
+function downloadGeoJSON() {
+  if (features.length === 0) { showToast('⚠️ لا توجد أشكال'); return; }
+  const gj = buildGeoJSON();
+  const blob = new Blob([JSON.stringify(gj, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'shapes.geojson';
+  a.click();
+  showToast('⬇ جاري التحميل...');
+}
+
+function clearAll() {
+  if (features.length === 0) return;
+  drawnItems.clearLayers();
+  features = [];
+  selectedId = null;
+  updateStats();
+  renderList();
+  showToast('🗑 تم مسح الكل');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
