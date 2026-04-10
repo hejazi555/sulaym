@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta property="og:title" content="( فهرس قبائل وعوائل كتاب ملامح من تاريخ قبيلة سليم في الحجاز ومن يجاورهم ) الطبعة الثانية" />
+<meta property="og:description" content="القبائل في كتاب ملامح من تاريخ قبيلة سليم ومن يجاورهم - للمؤلف زياد بن لفيان السلمي" />
+<meta property="og:image" content="https://hejazi555.github.io/sulaym/image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hejazi555.github.io/sulaym/" />
+    
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="( فهرس قبائل وعوائل كتاب ملامح من تاريخ قبيلة سليم في الحجاز ومن يجاورهم ) الطبعة الثانية" />
+<meta name="twitter:description" content="القبائل في كتاب ملامح من تاريخ قبيلة سليم ومن يجاورهم - للمؤلف زياد بن لفيان السلمي" />
+<meta name="twitter:image" content="https://hejazi555.github.io/sulaym/image.jpg" />
+<title> دليل القبائل</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f6f1;
+    --surface: #ffffff;
+    --border: #ddd8cc;
+    --accent: #5a3e28;
+    --accent-light: #8c6540;
+    --accent-muted: #ede8df;
+    --text: #1a1410;
+    --text-muted: #6b5c4a;
+    --tribe-bg: #2c1f10;
+    --tribe-text: #f5ede0;
+    --shadow: 0 2px 14px rgba(0,0,0,0.10);
+    --radius: 10px;
+    --zero-color: #b0a090;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Naskh Arabic', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--tribe-bg);
+    color: var(--tribe-text);
+    padding: 30px 20px 24px;
+    text-align: center;
+    border-bottom: 4px solid var(--accent-light);
+  }
+  .header h1 { font-size: clamp(1.5rem,4.5vw,2.2rem); font-weight:700; margin-bottom:6px; }
+  .header p  { font-size: clamp(0.95rem,2.5vw,1.1rem); opacity:0.72; }
+
+  /* ── STICKY TOOLBAR ── */
+  .toolbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+
+  /* Search */
+  .search-row {
+    padding: 12px 16px 10px;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .search-box {
+    position: relative;
+    flex: 1;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 12px 46px 12px 18px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: clamp(1rem,2.5vw,1.15rem);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: right;
+  }
+  .search-box input:focus { border-color: var(--accent-light); }
+  .search-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    pointer-events: none;
+  }
+
+  /* Clear button */
+  .clear-btn {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 16px;
+    background: #f0e8de;
+    color: var(--accent);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: clamp(0.9rem,2.2vw,1rem);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.18s, border-color 0.18s;
+    flex-shrink: 0;
+  }
+  .clear-btn:hover { background: #e8ddd0; border-color: var(--accent-light); }
+  .clear-btn.visible { display: flex; }
+  .clear-btn svg { flex-shrink: 0; }
+
+  /* Tribe tabs wrapper */
+  .tribe-tabs-outer {
+    position: relative;
+    border-top: 1px solid var(--accent-muted);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  /* fade indicators */
+  .tribe-tabs-outer::before,
+  .tribe-tabs-outer::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 36px;
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity 0.2s;
+  }
+  .tribe-tabs-outer::before {
+    right: 0;
+    background: linear-gradient(to left, var(--surface), transparent);
+  }
+  .tribe-tabs-outer::after {
+    left: 0;
+    background: linear-gradient(to right, var(--surface), transparent);
+  }
+  .tribe-tabs-outer.at-start::after  { opacity: 0; }
+  .tribe-tabs-outer.at-end::before   { opacity: 0; }
+
+  /* Tribe tabs */
+  .tribe-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    padding: 0 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  .tribe-tabs::-webkit-scrollbar { display: none; }
+
+  .tribe-tab {
+    padding: 11px 16px;
+    font-family: inherit;
+    font-size: clamp(0.95rem,2.3vw,1.1rem);
+    font-weight: 600;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.18s, border-color 0.18s;
+    flex-shrink: 0;
+  }
+  .tribe-tab:hover { color: var(--accent); }
+  .tribe-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tribe-tab.zero-results { color: var(--zero-color); }
+
+  .tab-count {
+    display: inline-block;
+    background: var(--accent-muted);
+    color: var(--accent-light);
+    border-radius: 20px;
+    font-size: 0.78rem;
+    padding: 1px 8px;
+    margin-right: 5px;
+    font-weight: 700;
+    transition: background 0.18s, color 0.18s;
+  }
+  .tribe-tab.active .tab-count { background: var(--accent); color: #fff; }
+  .tribe-tab.zero-results .tab-count { background: #e8e2da; color: var(--zero-color); }
+
+  /* ── MAIN ── */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px 16px 50px;
+  }
+
+  /* global search summary bar */
+  .search-summary {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 18px;
+    margin-bottom: 18px;
+    font-size: clamp(0.92rem,2.2vw,1rem);
+    color: var(--text-muted);
+    align-items: center;
+    gap: 8px;
+  }
+  .search-summary.visible { display: flex; }
+  .summary-total {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: clamp(1rem,2.5vw,1.1rem);
+  }
+
+  /* Panel heading */
+  .panel-heading {
+    background: var(--tribe-bg);
+    color: var(--tribe-text);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .panel-heading-name { font-size: clamp(1.15rem,3vw,1.45rem); font-weight:700; flex:1; }
+  .panel-heading-count {
+    background: rgba(255,255,255,0.18);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.92rem;
+    white-space: nowrap;
+  }
+  .panel-heading-count.filtered {
+    background: rgba(255,220,100,0.25);
+  }
+
+  /* Families table */
+  .families-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 22px;
+    background: var(--accent-muted);
+    border-bottom: 2px solid var(--border);
+    font-size: clamp(0.92rem,2.2vw,1rem);
+    font-weight: 700;
+    color: var(--accent-light);
+  }
+  .th-name { width:160px; min-width:130px; flex-shrink:0; }
+  .th-pages { flex:1; }
+
+  .family-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--accent-muted);
+    gap: 16px;
+    transition: background 0.15s;
+  }
+  .family-row:last-child { border-bottom: none; }
+  .family-row:hover { background: #faf7f1; }
+
+  .family-name {
+    font-size: clamp(1.05rem,2.8vw,1.22rem);
+    font-weight: 700;
+    color: var(--text);
+    width: 160px;
+    min-width: 130px;
+    flex-shrink: 0;
+    padding-top: 3px;
+    line-height: 1.5;
+  }
+
+  .family-sep {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+    flex-shrink: 0;
+    margin: 2px 0;
+  }
+
+  .family-pages-wrap {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 7px;
+    align-items: flex-start;
+    padding-top: 2px;
+    direction: rtl;
+    justify-content: flex-start;
+  }
+
+  .page-pill {
+    display: inline-block;
+    background: var(--accent-muted);
+    color: var(--accent);
+    border-radius: 6px;
+    padding: 4px 11px;
+    font-size: clamp(0.88rem,2vw,0.98rem);
+    font-weight: 600;
+    direction: ltr;
+    line-height: 1.5;
+    transition: background 0.15s;
+  }
+  .family-row:hover .page-pill { background: #e0d8cc; }
+
+  .page-pill.hl-pill {
+    background: #ffe08a;
+    color: #5a3e00;
+    font-weight: 700;
+  }
+
+  .hl { background: #ffe08a; border-radius: 2px; padding: 0 1px; }
+
+  .no-results {
+    text-align: center;
+    padding: 55px 20px;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 560px) {
+    .table-header { display: none; }
+    .family-row { flex-direction: column; gap: 8px; padding: 12px 14px; }
+    .family-name { width: auto; min-width: unset; }
+    .family-sep { display: none; }
+    .panel-heading { padding: 13px 14px; }
+    .tribe-tab { padding: 10px 12px; }
+    .clear-btn { padding: 10px 12px; font-size: 0.88rem; }
+  }
+  /* ── FOOTER ── */
+.footer {
+  background: var(--tribe-bg);
+  color: var(--tribe-text);
+  border-top: 4px solid var(--accent-light);
+  padding: 28px 20px 20px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.footer-name {
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.footer-sub {
+  font-size: clamp(0.88rem, 2vw, 1rem);
+  opacity: 0.65;
+  margin-bottom: 18px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: 30px;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  color: var(--tribe-text);
+  text-decoration: none;
+  font-size: clamp(0.88rem, 2vw, 1rem);
+  font-family: inherit;
+  background: rgba(255,255,255,0.07);
+  transition: background 0.2s, border-color 0.2s;
+}
+.footer-link:hover {
+  background: rgba(255,255,255,0.16);
+  border-color: var(--accent-light);
+}
+
+.footer-link svg {
+  flex-shrink: 0;
+}
+
+.footer-copy {
+  font-size: 0.82rem;
+  opacity: 0.45;
+  margin-top: 14px;
+}
+/* ── HEADER LINKS & COPYRIGHT ── */
+.header-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 30px;
+  border: 1.5px solid rgba(255,255,255,0.22);
+  color: var(--tribe-text);
+  text-decoration: none;
+  font-size: clamp(0.85rem, 2vw, 0.98rem);
+  font-family: inherit;
+  background: rgba(255,255,255,0.08);
+  transition: background 0.2s, border-color 0.2s;
+}
+.header-link:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: var(--accent-light);
+}
+
+.header-copy {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  margin-top: 14px;
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>( فهرس قبائل وعوائل كتاب ملامح من تاريخ قبيلة سليم في الحجاز ومن يجاورهم ) الطبعة الثانية</h1>
+  <p>اختر قبيلة لرؤية فروعها</p>
+
+  <div class="header-links">
+
+    <!-- واتساب -->
+    <a class="header-link" href="https://wa.me/96655947524" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      واتساب
+    </a>
+
+
+
+  </div>
+
+  <p class="header-copy">مندوب الكتاب للتوصيل لكل مدن المملكة: 0559475247</p>
+</div>
+
+<script>
+  document.getElementById('headerYear').textContent = new Date().getFullYear();
+</script>
+
+<div class="toolbar">
+  <div class="search-row">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="ابحث عن قبيلة أو رقم صفحة..." autocomplete="off">
+    </div>
+    <button class="clear-btn" id="clearBtn">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      إلغاء البحث
+    </button>
+  </div>
+  <div class="tribe-tabs-outer" id="tribeTabsOuter">
+    <div class="tribe-tabs" id="tribeTabs"></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="search-summary" id="searchSummary">
+    <span>نتائج البحث في جميع الأقسام:</span>
+    <span class="summary-total" id="summaryTotal"></span>
+  </div>
+  <div id="mainContainer"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  JSON DATA
+// ════════════════════════════════════════
+const data = [
+  {
+    tribe: "بنو سليم", cls: "t1",
+    families: [
+      { name: "ربيعة من سليم ( ذكرهم في أبيات الشعر ) شاملاََ (المطردي والأذيني والصادري والزحيمي والمرشدي والشنيني والفني والحسيني والنمري والقنبي والعبيدي والمدهوني والعطافي والنقريني)", pages: [157,177,180,216,222,283,290,295,299,300,308,314,330,426,427,457,483,567,730] },
+      
+      { name: "الوركان من المطاردة من سليم (الوريكاني )", pages: [81,85,87,90,216,310,313,317,335,339,387,388,390,397,401,403,417,424,460,470,560,561,564,565,659,674,693,710,730,741] },
+      { name: "المطاردة من سليم ( المطردي )", pages: [58,72,86,91,94,97,169,170,217,222,240,280,306,321,323,329,332,334,386,387,388,389,392,397,400,402,409,410,411,412,420,421,435,439,440,442,443,444,445,447,449,451,452,453,549,552,553,554,555,556,559,574,575,576,601,607,628,630,631,633,658,659,660,674,675,685,689,690,691,695,701,702,709,710,726,727,728,729,732,735,736,737,742] },
+      { name: "الزّحَمَة من سليم ( الزحيمي )", pages: [98,99,169,170,171,172,176,216,240,244,247,248,250,252,253,260,264,276,278,279,280,313,318,362,363,364,368,373,374,387,388,393,444,448,453,478,479,480,482,557,559,560,566,573,601,622,623,625,634,672,701,704,705,710,711,726,728] },
+      { name: "الصّدّر من سليم ( الصادري )", pages: [170,172,216,224,262,280,289,303,364,406,412,439,453,470,471,526,527,528,533,534,557,565,631,676,685,701,702,712,713,725,735,736,737,741] },
+      { name: "الأذينات من سليم ( الأذيني )", pages: [91,166,168,232,234,280,364,365,439,440,444,445,447,448,449,450,451,453,573,631,701,713] },
+      { name: "الفنانية من سليم (الفني )", pages: [46,47,80,143,167,168,321,323,353,406,410,413,414,416,451,452,503,533,534,550,557,567,626,658,702,704,714,729,735] },
+
+      { name: " العْبِدَة من سليم ( العبيدي )", pages: [155,156,196,212,280,285,287,290,292,298,307,318,368,375,376,377,378,379,380,382,383,384,385,411,414,415,438,497,498,515,525,543,557,617,672,673,675,692,701,702,714,736] },
+      { name: "العطاطيف من سليم", pages: [52,58,169,240,241,243,252,253,258,264,280,303,306,368,369,374,375,377,415,438,633,634,635,640,714,729,731] },
+      { name: "المراشدة من سليم ( المرشدي )", pages: [91,280,412,557,713,714,727,730] },
+
+      { name: "النقرين من سليم", pages: [153,240,252,280,318,368,375,415,525,591,673] },
+      { name: "القنانبة من سليم", pages: [280,368,375,524,525,526,591] },
+      { name: "المداهين من سليم", pages: [215,217,280,285,287,292,298,307,368,370,375,428,672,673,686] },
+      { name: "الحسنان من سليم", pages: [216,280,316,317,318,327,328,368,473,474,527,529,543,680] },
+      { name: "النمران من سليم", pages: [47,280,318,328,368,473,474,543,600,601,680] },
+      { name: "الشنونة  من سليم", pages: [49,215,280,318,328,331,368,369,373,374,383,385,449,453,459,474,475,476,539,544,548,624,640,648,653,655,656,657,680,690,698,699,706] },
+
+
+      { name: "بني سري من ربيعة من سليم", pages: [153,234,235,308,368,374,410,411,413,414,424,601,616,634] },
+      { name: "بني نوال من ربيعة من سليم", pages: [289,308,317,336,396,409,410,411,418,425,460,543,607,616,628,659,675,732] },
+      
+      { name: "بقيل من سليم وهم: ( المستوري والجامعي والبناتي والمحمادي والعلياني والبنوي والعلوي والكلبي والقزيعي )", pages: [86,143,147,152,200,210,223,224,225,226,228,230,249,256,271,272,273,401,402,407,408,460,461,462,465,467,470,476,485,487,488,489,490,494,495,496,509,510,511,514,515,518,577,578,580,603,609,610,611,612,613,614,616,617,630,634,693,694] },
+      { name: "ذوي عليان من بقيل من سليم", pages: [48,98,249,252,256,461,462,489,715] },
+      { name: "ذوي مستور من بقيل من سليم", pages: [201,208,225,272,485,487,488,490,515,577,578,579,580,582,609,620,640,673,674,675,693,694,715] },
+      { name: "القزاعين من بقيل من سليم", pages: [715,719] },
+      { name: "البنوان من بقيل من سليم", pages: [581,615] },
+      { name: "ذي بنات من بقيل من سليم", pages: [461,462,469,489,579,582,604,654,693,737,738] },
+      { name: "المحاميد من بقيل من سليم", pages: [461,465,466] },
+      { name: "الكلبة من بقيل من سليم", pages: [494,581,582] },
+      { name: "الجوامع من بقيل من سليم", pages: [95,225,487,488,489,577,580,610,611,613,619,620,633,634,638,695,696,697,723,724] },
+      { name: "ذوي علي من بقيل من سليم", pages: [226] },
+
+
+
+      { name: "حليل من سليم وهم: ( ذوي جبرين والربقة والوعارى واللبانية والحسانية وبني عطا والموسة والعوالي والنغيرات )", pages: [85,87,88,159,184,192,236,238,240,326,454,455,456,488,489,494,535,585,586,614,626,627,630,634,681,702,716,717,722] },
+      { name: "الوعارى من حليل من سليم", pages: [85,87,88,494,585,586,614,716] },
+      { name: "ذوي جبرين من حليل من سليم", pages: [159,455,456,488,489,535,614,681,716,717] },
+      { name: "الموسة من حليل من سليم", pages: [326,535] },
+      { name: "بني عطا من حليل من سليم", pages: [184,192,236,240,494,717,722] },
+      { name: "اللبانية من حليل من سليم", pages: [716] },
+      { name: "الربقة من حليل من سليم", pages: [717] },
+      { name: "الحسانية من حليل من سليم", pages: [702,716] },
+      { name: "العوالي من حليل من سليم", pages: [454] },
+
+
+      { name: "دميح من سليم وهم: ( الدملوكي والوبيري والثابتي والمثيلي )", pages: [50,52,53,152,154,164,200,207,209,226,230,401,402,405,407,408,423,467,496,509,510,518,603,610,611,616,617,630,634] },
+      { name: "الدمالكة من دميح من سليم", pages: [83,154,155,156,164,165,200,201,206,207,208,209,210,212,226,227,228,229,249,256,401,402,405,407,480,481,482,488,492,493,494,558,560,604,610,611,612,639,640,641,655,656,675,714,715] },
+
+
+
+
+
+      { name: "باقي بني عامر (الذوادي والسالمي والذبيبة والعصوي والعطيفة والقويسمي )", pages: [86,143,197,200,212,224,225,226,227,228,401,440,457,468,492,494,495,496,497,498,499,500,548,549,550,609,611,612,613,628,630,634,715,716] },
+
+
+
+      { name: "بني بركه من سليم", pages: [630] },
+      { name: "الجباريت من بركة من سليم", pages: [57,86,169,455,456,601,640,674] },
+      { name: "الرزم من بركة من سليم", pages: [200,407,611,701,717,718] },
+      { name: "الخضرة من بركة من سليم", pages: [70,209,477,676,718,722] },
+      { name: "الفقهاء من بركة من سليم", pages: [457,524,526,575,601,602,617,627,630,634,639,640,648,672,674,735,736,738,740] },
+      { name: "المساريح من بركة من سليم", pages: [60,718] },
+
+
+
+
+
+      { name: "حبش من سليم وهم: بني محمد والجلاة والودعان (المرابحة) وبني علا", pages: [26,42,95,138,161,162,172,173,181,197,457,472,473,504,508,518,523,571,605,616,617,630,634] },
+      
+      
+      { name: "الهمعان من سليم", pages: [49, 56, 99, 161, 361, 362, 396, 400, 412, 495, 496, 499, 500, 502, 505, 507, 513, 548, 571, 605, 627, 630, 640, 673, 736] },
+
+
+      { name: "القوعة من سليم", pages: [54,95,98,412,471,495,496,499,500,501,502,503,504,505,507,532,571,572,605,627,692,718] },
+      
+      { name: "التراجمة من سليم", pages: [53, 81, 85, 86, 87, 92, 161, 166, 173, 179, 217, 252, 255, 285, 291, 293, 303, 310, 322, 329, 348, 382, 387, 454, 475, 507, 515, 625, 659, 674, 675, 676, 696, 736] },
+
+      { name: "المرنة من سليم", pages: [152,172,252,255,520,521,522,523,571,572] },
+
+      { name: "العمشان من سليم", pages: [293,490,492,502,516] },
+      { name: "العجفان من سليم", pages: [85,348,490,516,522,674,675,718,719] },
+      { name: "الحجرة من سليم", pages: [72,349,495,496,515,516,517,518,636,736] },
+      { name: "المغايظة من سليم", pages: [412,413,421,495,496,719] },
+
+      { name: "الجلاة من حبش من سليم شاملاََ (الحمودي والسريحي والهبتلي والنجاري والصابري والشكري والزويني والرزقني والمقعي)", pages: [86,163,472,473,506,515,516,667,668,669,670,671,674,675,676,734,736] },
+      
+      { name: "الضباعين من بني علا من حبش من سليم", pages: [86,143,340,524] },
+      
+      { name: "المرابحة (الودعان) من حبش من سليم وهم: (العيدي والعلوي والبسيسي والمظيفري)", pages: [152,161,162,181,236,238,239,240,250,251,453,454,583,584,659,661,662,663,664,665,666,697] },
+
+      { name: "قبيلة زعب من سليم", pages: [78,136,137,139] },
+
+    ]
+  },
+  
+  {
+     tribe: "حرب", cls: "t3",
+    families: [
+      { name: "معبد من حرب", pages: [63,67,89,159,166,167,168,169,172,173,174,176,177,178,179,181,214,215,216,217,219,222,250,251,271,292,342,345,375,386,387,390,392,393,395,396,397,403,445,446,453,454,455,456,457,459,460,480,481,583,662,663,665,667,668,669,670,742] },
+
+      { name: "بني عمرو وادي الفرع من حرب", pages: [181,185,189,190,191,192,193,194,197,213,214,271,404,537,589,592,595,596,677,678,679,682] },
+
+      
+      { name: "بني يزيد وادي حجر من حرب", pages: [193,256,268,269,270,271,272,273,274,275,276,277,496,498,578,579,580,641,681,682,694] },
+      { name: "عوف من حرب", pages: [50,58,79,476,536,537,585,591,594,595,677,682,722] },
+      { name: "الزبلان من حرب", pages: [277,438,491,496,498,508,518,519,624,641] },
+      { name: "البلادية من حرب", pages: [63,182,183,184,187,271,291,406,485,486,487,488,489,490,621,702] },
+      { name: "زبيد من حرب", pages: [63,144,145,146,189,191,236,237,238,239,240,268,342,343,345,394,455,456,491,520,522,536,537,619,621,622,624,626,627,628,629,633,680,682,683,709] },
+      { name: "مخلف من حرب", pages: [537,656,677] },
+      { name: "السفران من حرب", pages: [144,627] },
+      { name: "بني بشر من العمور من حرب", pages: [145,189,342,345,667] },
+      { name: "بني سالم من حرب", pages: [63,175,532] },
+      { name: "الكثري من حرب", pages: [477,478] },
+      { name: "اليوبي من حرب", pages: [194] },
+      { name: "بني يسلم أهل حجر", pages: [271,272,273,277] },
+
+    ]
+  },
+  {
+    tribe: "مطير", cls: "t2",
+    families: [
+      { name: "العضيلات من الصعبة من مطير", pages: [51,63,201,210,212,226,274,275,278,352,353,359,385,404,533,573,590,591,605,611,621,622,627,632,633,634,635,636,642,646,647,649,654,693] },
+      { name: "المهالكة من الصعبة من مطير", pages: [213,500,591,636,649] },
+      { name: "الهجال من الصعبة من مطير", pages: [192,211,223,278,611,621,635,636,649] },
+      { name: "الشطر من الصعبة من مطير", pages: [581] },
+      { name: "الوطابين من الصعبة من مطير", pages: [636,649,655,656,678] },
+      { name: "المشاريف من الصعبة من مطير", pages: [184,193,275,611] },
+      { name: "الصعبة من مطير", pages: [199,201,211,212,227,385,386,500,612,614,637,639,641,645,649,650,657,678,681] },
+      { name: "القمشان من الشلالحة من مطير", pages: [199,223,224,225,226,277,460,461,590,611,612,621,633,634,640,651] },
+      { name: "الضبطان من الشلالحة من مطير", pages: [148,226,241,350,358,360,380,402,552,553,554,555,565,591,605,609,613,655,657,690,691,692] },
+      { name: "الموايق من الشلالحة من مطير", pages: [67,404,461,464,466,467,610,612,652] },
+      { name: "الرحامين من الشلالحة من مطير", pages: [53,183,186,189,190,198,201,204,205,210,211,212,213,350,358,360,401,402,405,555,556,557,558,559,560,562,566,567,568,569,590,591,633,634,640] },
+      { name: "السمون من الشلالحة من مطير", pages: [186,188,612,621,634] },
+      { name: "الذهيبات من الشلالحة من مطير", pages: [56,184,274,634] },
+      { name: "القعوان من الشلالحة من مطير", pages: [492,515,591,640,737,738] },
+      { name: "المعوز من الشلالحة من مطير", pages: [634] },
+      { name: "الشلالحة من مطير", pages: [63,186,193,199,201,212,226,227,350,352,353,360,385,401,402,460,462,466,467,468,469,470,500,545,549,553,556,572,573,611,612,614,621,627,632,637,638,639,641,642,645,649,657,681] },
+
+
+      { name: "الظوافرة من الهويملات من مطير", pages: [228,229,231,273,352,492,548,549,585,590,591,592,594,677] },
+      { name: "اليبس من الهويملات مطير", pages: [201,209,598] },
+      { name: "الحمايين من الهويملات من مطير", pages: [57,189,200,202,270,273,432,480,481,483] },
+      { name: "الشباشرة من الهويملات من مطير", pages: [147,193,201,269,270,276,480,481,483,577,578,579,580] },
+      { name: "الربعان من الهويملات من مطير", pages: [182,183,227] },
+      { name: "العقالية من الهويملات من مطير", pages: [524,525,573,633] },
+      { name: "الحنانيش من الهويملات من مطير", pages: [463,552,577,613] },
+      { name: "الهويملات من مطير", pages: [63,184,190,193,194,199,201,212,226,227,482,553,585,611,612,613,677,681] },
+      { name: "ميمون من مطير", pages: [591,598] },
+      { name: "العزايزة من مطير", pages: [199,201,210,211,227,271,273,275,404,496,498,509,510,511,513,514,515,581,582,599,609,610,611,612,613,614,615,677,678,681,682,693,694] },
+      { name: "العونة من مطير", pages: [66,199,269,270,271,509,510,511,513,514,581,582,598,609,611,612,633,649,681,693,694] },
+      { name: "بريه تحديدا: الدياحين والعوارض والوساما", pages: [404,598,599,603,604,611,612,614,621,622,632,681,682] },
+      { name: "علوى من مطير", pages: [147,677] },
+
+
+      
+    ]
+  },
+  {
+    tribe: "عتيبة", cls: "t4",
+    families: [
+      { name: "الزلاما من العوالي من  الروقة من عتيبة", pages: [152,164,165,234,235,286,289,309,314,315,353,357,358,375,376,410,413,415,427,431,433,435,437,470,471,589,730,733,740] },
+      { name: "العوالي من الروقة من عتيبة", pages: [63,152,164,243,252,286,288,306,353,356,375,387,410,412,413,415,424,426,427,430,434,526,588] },
+      { name: "الثعالية من العضيان  من الروقة من عتيبة", pages: [74,357,387,478,479,569,589,599,600,605,607,618,619,620,621,622,628,632,634,635,636,642,644,647,655,657,658] },
+      { name: "العضيان من الروقة من عتيبة", pages: [570,589,647] },
+      { name: "الغبيات من الروقة من عتيبة", pages: [558,560,636] },
+
+      { name: "ذوي عطية من الروقة من عتيبة", pages: [148,669] },
+
+      { name: "العوازم من الروقة من عتيبة", pages: [50,54,63,67,82,154,155,163,164,165,240,241,242,243,244,245,249,250,252,253,254,258,263,279,280,286,287,289,306,368,370,379,380,383,384,385,389,410,411,415,416,418,422,423,424,427,433,434,436,437,545,606,637,726,727,728,734] },
+      { name: "ذوي زراق من الروقة من عتيبة", pages: [74,179,180,232,235,240,243,244,250,259,263,264,280,281,286,288,292,296,299,300,306,310,312,313,322,354,359,361,362,363,368,371,375,390,391,397,400,410,413,416,417,421,430,439,478,479,480,481,482,483,484,485,526,527,549,552,553,554,555,565,574,575,576,583,605,606,607,726,728] },
+      { name: "الكراشمة من الروقة من عتيبة", pages: [63,286,306,379,410,430,548,549,637,644] },
+      { name: "الدلابحة من الروقة من عتيبة", pages: [63,164,165,286,288,379,369,548,549,575] },
+      { name: "الحزمان من الروقة من عتيبة", pages: [55,63,154,156,157,278,279,286,296,306] },
+      { name: "الذيبة من الروقة من عتيبة", pages: [63,234,235,242,243,263,286,306,350,361,410,413,421,429] },
+      { name: "الحفاة من الروقة من عتيبة", pages: [286,306] },
+      { name: "الاساعدة من الروقة من عتيبة", pages: [234,286,306,375,376,410] },
+
+      { name: "الثبتان من الروقة من عتيبة", pages: [152,680] },
+
+
+      { name: "القثمة من برقا من عتيبة", pages: [57,588] },
+      { name: "النفعة من برقا من برقا من عتيبة", pages: [417,591] },
+      { name: "المقطة من برقا من عتيبة", pages: [152,285,321,323,324,327,328,329,330,332,333,334,335,352,353,360,377,387,390,410,415,430,588,590,591,602] },
+
+
+    ]
+  },
+    {
+    tribe: "الملك عبدالعزيز", cls: "t6",
+    families: [
+      { name: "الملك عبدالعزيز", pages: [159,587,589,590,598,600,601,602,606,615,623,632,641,658,660,661,666,672,674,675,676,681,682,683,684,685,686,688,689,697,700,706,707,708,726,734,735,736,737,740] },
+    ]
+  },
+  {
+    tribe: "الأشراف", cls: "t5",
+    families: [
+      { name: "الأشراف", pages: [71,144,145,146,159,190,325,326,340,342,344,346,349,531,532,533,534,535,538,546,587,598,601,603,604,606,622,627,628,629,630,631,657,658,660,661,666,667,671,673,675,676,680,681,682,684,688,697,700,740] },
+      { name: "الأدارسة", pages: [697,698] },
+      { name: "البركاتي الشريف", pages: [79] },
+      {name: "ابن هويدي الشريف", pages: [737] },
+
+    ]
+  },
+
+  {
+    tribe: "قبائل أخرى", cls: "t7",
+    families: [
+      { name: "قبيلة هذيل", pages: [28,44,45,66,326,327,342,343,372,388,389,436,532,534,536,538,546,683,685,733] },
+      { name: "قبيلة تميم بن مر", pages: [219,282] },
+      { name: "قبيلة قحطان", pages: [404,588,634] },
+      { name: "قبيلة بني مالك", pages: [557,685,689] },
+      { name: "قبيلة بلي", pages: [532,698] },
+      { name: "قبيلة الحويطات", pages: [532] },
+      { name: "قبيلة بني عطية", pages: [532] },
+      { name: "قبيلة الرشايدة", pages: [62] },
+      { name: "جهينة", pages: [122,532,682] },
+      { name: "ثقيف", pages: [532] },
+      { name: "عنزة", pages: [532] },
+      { name: "البقوم", pages: [404,436,517,518,632,634] },
+      { name: "ابنا الحارث", pages: [404,517,518,532,683] },
+      { name: "قبيلة الشيوخ", pages: [169,215,216,217,349,629] },
+      { name: "النشمي", pages: [677] },
+      { name: "الخليفة", pages: [737] },
+
+      { name: "القرشي مهايع", pages: [86,696] },
+
+      { name: "شبابة", pages: [89] },
+      { name: "المهرة", pages: [709] },
+      { name: "الشرارات", pages: [709] },
+      { name: "الصيعر", pages: [709] },
+
+
+
+    ]
+  },
+  {
+    tribe: "الموالي", cls: "t66",
+    families: [
+      { name: "الموالي", pages: [201,527,529] },
+
+  ]
+  },
+
+];
+
+
+
+// ترتيب القبائل والعوائل يتبع ترتيب JSON بالضبط
+
+// ════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════
+let activeTribe = 0;
+let searchQ = '';
+
+// ════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════
+function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+function pageMatch(pages, q){
+  // if q is purely numeric → exact match only
+  if(/^\d+$/.test(q)) return pages.some(p => p === Number(q));
+  // otherwise text search in stringified pages
+  return pages.some(p => String(p).includes(q));
+}
+
+function matchCount(tribe, q){
+  if(!q) return tribe.families.length;
+  return tribe.families.filter(f =>
+    f.name.includes(q) || pageMatch(f.pages, q)
+  ).length;
+}
+
+// ════════════════════════════════════════
+//  TABS  (counts update with search)
+// ════════════════════════════════════════
+const tabsEl = document.getElementById('tribeTabs');
+
+function buildTabs(){
+  tabsEl.innerHTML='';
+  const q = searchQ.trim();
+  data.forEach((tribe,i)=>{
+    const mc = matchCount(tribe, q);
+    const total = tribe.families.length;
+
+    const btn = document.createElement('button');
+    btn.className = 'tribe-tab'
+      + (i===activeTribe ? ' active' : '')
+      + (q && mc===0 ? ' zero-results' : '');
+
+    const countLabel = q ? `${mc}/${total}` : `${total}`;
+    btn.innerHTML = `${tribe.tribe} <span class="tab-count">${countLabel}</span>`;
+
+    btn.addEventListener('click',()=>{
+      activeTribe = i;
+      buildTabs();
+      renderPanel();
+      scrollTabIntoView(i);
+    });
+    tabsEl.appendChild(btn);
+  });
+  requestAnimationFrame(updateScrollIndicators);
+}
+
+// ════════════════════════════════════════
+//  RENDER PANEL  (active tribe only)
+// ════════════════════════════════════════
+const mainEl   = document.getElementById('mainContainer');
+const summaryEl = document.getElementById('searchSummary');
+const totalEl   = document.getElementById('summaryTotal');
+
+function renderPanel(){
+  const tribe = data[activeTribe];
+  const q = searchQ.trim();
+
+  // — global summary —
+  if(q){
+    const globalTotal = data.reduce((s,t)=>s+matchCount(t,q),0);
+    summaryEl.classList.add('visible');
+    totalEl.textContent = globalTotal
+      ? `${globalTotal} قبيلة في جميع الأقسام`
+      : 'لا توجد نتائج في أي قسم';
+  } else {
+    summaryEl.classList.remove('visible');
+  }
+
+  // — rows for active tribe —
+  let visible = 0;
+  const rowsHTML = tribe.families.map(fam=>{
+    const match = !q || fam.name.includes(q) || pageMatch(fam.pages, q);
+    if(!match) return '';
+    visible++;
+
+    const dName = q
+      ? fam.name.replace(new RegExp(`(${escapeRe(q)})`,'g'),'<span class="hl">$1</span>')
+      : fam.name;
+
+    const isNumeric = /^\d+$/.test(q);
+    const pills = fam.pages.map(p=>{
+      const isHit = q && (isNumeric ? p === Number(q) : String(p).includes(q));
+      return `<span class="page-pill${isHit?' hl-pill':''}">${p}</span>`;
+    }).join('');
+
+    return `
+      <div class="family-row">
+        <span class="family-name">${dName}</span>
+        <div class="family-sep"></div>
+        <div class="family-pages-wrap">${pills}</div>
+      </div>`;
+  }).join('');
+
+  // count badge in panel heading
+  const countLabel = q
+    ? `${visible} من ${tribe.families.length}`
+    : `${tribe.families.length} فرعََا`;
+  const countClass = q ? 'panel-heading-count filtered' : 'panel-heading-count';
+
+  if(q && visible===0){
+    mainEl.innerHTML=`
+      <div>
+        <div class="panel-heading">
+          <span class="panel-heading-name">${tribe.tribe}</span>
+          <span class="${countClass}">${countLabel}</span>
+        </div>
+        <div class="families-wrap">
+          <div class="no-results">لا توجد نتائج لـ "${q}" في هذا القسم</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  mainEl.innerHTML=`
+    <div>
+      <div class="panel-heading">
+        <span class="panel-heading-name">${tribe.tribe}</span>
+        <span class="${countClass}">${countLabel}</span>
+      </div>
+      <div class="families-wrap">
+        <div class="table-header">
+          <span class="th-name">القبيلة</span>
+          <div class="family-sep"></div>
+          <span class="th-pages">الصفحات</span>
+        </div>
+        ${rowsHTML}
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════
+//  SEARCH INPUT
+// ════════════════════════════════════════
+const inputEl  = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearBtn');
+
+function onSearch(val){
+  searchQ = val;
+  clearBtn.classList.toggle('visible', val.length > 0);
+  buildTabs();
+  renderPanel();
+}
+
+let db;
+inputEl.addEventListener('input', e=>{
+  clearTimeout(db);
+  db = setTimeout(()=> onSearch(e.target.value), 160);
+});
+
+clearBtn.addEventListener('click',()=>{
+  inputEl.value = '';
+  onSearch('');
+  inputEl.focus();
+});
+
+// ════════════════════════════════════════
+//  TABS SCROLL INDICATORS
+// ════════════════════════════════════════
+const tabsOuter = document.getElementById('tribeTabsOuter');
+
+function updateScrollIndicators(){
+  const el = tabsEl;
+  const atStart = el.scrollLeft >= (el.scrollWidth - el.clientWidth - 2);
+  const atEnd   = el.scrollLeft <= 2;
+  tabsOuter.classList.toggle('at-start', atStart);
+  tabsOuter.classList.toggle('at-end',   atEnd);
+}
+tabsEl.addEventListener('scroll', updateScrollIndicators, {passive:true});
+
+function scrollTabIntoView(index){
+  const tabs = tabsEl.querySelectorAll('.tribe-tab');
+  if(tabs[index]) tabs[index].scrollIntoView({behavior:'smooth', block:'nearest', inline:'nearest'});
+}
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+buildTabs();
+renderPanel();
+updateScrollIndicators();
+</script>
+<!--
+
+<footer class="footer">
+  <div class="footer-name">اسمك هنا</div>
+  <div class="footer-sub">وصفك هنا — مثلاً: باحث في الأنساب والتاريخ</div>
+
+  <div class="footer-links">
+
+    <a class="footer-link" href="https://twitter.com/حسابك" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+      تويتر / X
+    </a>
+
+    <a class="footer-link" href="https://wa.me/966XXXXXXXXX" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      واتساب
+    </a>
+
+    <a class="footer-link" href="https://t.me/حسابك" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+      </svg>
+      تيليغرام
+    </a>
+
+    <a class="footer-link" href="https://instagram.com/حسابك" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+      </svg>
+      انستغرام
+    </a>
+
+    <a class="footer-link" href="https://snapchat.com/add/حسابك" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24c6.624 0 11.987-5.367 11.987-11.987C24.004 5.367 18.641 0 12.017 0z"/>
+      </svg>
+      سناب شات
+    </a>
+
+  </div>
+
+  <div class="footer-copy">
+    جميع الحقوق محفوظة &copy; <span id="footerYear"></span> — لا يُسمح بالنقل أو النشر إلا بإذن صريح
+  </div>
+</footer>
+
+<script>
+  document.getElementById('footerYear').textContent = new Date().getFullYear();
+</script>
+
+//-->
+</body>
+</html>
